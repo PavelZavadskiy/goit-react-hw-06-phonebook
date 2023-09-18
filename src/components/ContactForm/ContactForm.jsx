@@ -2,6 +2,10 @@ import { nanoid } from 'nanoid';
 import { Wrapper, Text, Input, Button, ErrorText } from './ContactForm.styled';
 import { Formik, ErrorMessage } from 'formik';
 import * as yup from 'yup';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { getContacts } from '../../redux/selectors';
+import { addContact } from '../../redux/contactsSlice';
 
 const initialValues = {
   name: '',
@@ -19,12 +23,14 @@ let userSchema = yup.object({
     .required(),
 });
 
-export function ContactForm(props) {
+export function ContactForm() {
+  const dispatch = useDispatch();
+  const contacts = useSelector(getContacts);
+
   const handleOnSubmit = (values, actions) => {
-    const { contacts } = props;
     if (contacts.find(contact => contact.name.toLowerCase() === values.name.toLowerCase()) === undefined) {
       const item = { id: nanoid(), name: values.name, number: values.number };
-      props.addContact(item);
+      dispatch(addContact(item));
       actions.resetForm();
     } else {
       alert(`${values.name} is already in contacts.`);
